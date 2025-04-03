@@ -4,11 +4,13 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 
-# this class inherits from FileSystemHandler so we can reDefine methods like (oncreated , on deleted...)
+# this class inherits from FileSystemHandler 
+# so we can reDefine methods like (oncreated , on deleted...)
 class MyHandler(FileSystemEventHandler):
     def list_existing_files(self):
 
-        # Lists all existing files containing 'content-banned' before monitoring starts.
+        # Lists all existing files containing 
+        # 'content-banned' before monitoring starts.
 
         existing_files = [f for f in os.listdir(".") if "content-banned" in f]
         if existing_files:
@@ -20,20 +22,22 @@ class MyHandler(FileSystemEventHandler):
         else:
             print("\n No existing 'content-banned' files found , listening ... ")
 
+    #we create a helper function
+    #in order to avoid repeating the ifs 
+    def log_event(self, event, action):      
+        file_name = os.path.basename(event.src_path)
+        if "content-banned" in file_name:
+          print(f" {file_name} has been {action}.")
+
     def on_created(self, event):
-        # Check if 'content-banned' is in the file name
-        if "content-banned" in os.path.basename(event.src_path):
-            print(f"File {event.src_path} has been created")
+        self.log_event(event, "created")
 
     def on_modified(self, event):
-        # Check if 'content-banned' is in the file name
-        if "content-banned" in os.path.basename(event.src_path):
-            print(f"File {event.src_path} has been modified")
+        self.log_event(event, "modified")
 
     def on_deleted(self, event):
-        # Check if 'content-banned' is in the file name
-        if "content-banned" in os.path.basename(event.src_path):
-            print(f"File {event.src_path} has been deleted")
+        self.log_event(event, "deleted")
+
 
 
 def main():
